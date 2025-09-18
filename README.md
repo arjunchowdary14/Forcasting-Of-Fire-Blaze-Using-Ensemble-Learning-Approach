@@ -31,6 +31,3 @@ CLASSIFICATION CODE EXPLANATION
 14.AUC is calculated for each model to measure overall performance. Higher AUC indicates better classification ability.
 15.ROC curves are plotted for all three models. A diagonal reference line represents random guessing.
 16.Error metrics can be computed by predicting the class labels using predict method. This allows you to calculate mean squared error, mean absolute error, accuracy, or other metrics as needed.
-If you want, I can also rewrite the regression section to explain why it is unusual to use regressors for ROC curves in a humanized note-friendly way, because that is something your lecturer might ask about.
-
-Do you want me to do that?
