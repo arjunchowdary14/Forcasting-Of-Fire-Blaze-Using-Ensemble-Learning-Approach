@@ -1,0 +1,59 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.svm import SVR
+from sklearn.metrics import roc_curve, auc, mean_squared_error, mean_absolute_error
+
+# Load dataset
+file_path = '/content/forestfires.csv'
+df = pd.read_csv(file_path)
+
+# Define features and target
+X = df.drop(columns=['area'])  # Features
+y = df['area']  # Target (continuous)
+
+# One-hot encoding for categorical variables
+X = pd.get_dummies(X, drop_first=True)
+
+# Convert regression target into a binary classification problem
+y_binary = (y > 0).astype(int)  # Fire occurred or not
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y_binary, test_size=0.2, random_state=42)
+
+# Optimize Random Forest to achieve ~85% accuracy
+best_rf = RandomForestRegressor(n_estimators=200, max_depth=15, min_samples_split=5, random_state=42)
+
+# Initialize models
+models = {
+    'Random Forest': best_rf,
+    'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42),
+    'SVR': SVR(kernel='rbf', C=1, gamma=0.01)
+}
+
+plt.figure(figsize=(10, 6))
+
+# Train models, evaluate performance, and plot ROC curves
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    y_scores = model.predict(X_test)  # Continuous predictions
+    fpr, tpr, _ = roc_curve(y_test, y_scores)
+    roc_auc = auc(fpr, tpr)
+
+    
+
+    print(f"{name} Performance:")
+    print(f"AUC: {roc_auc:.2f}")
+   
+
+    plt.plot(fpr, tpr, label=f'{name} (AUC = {roc_auc:.2f})')
+
+# Plot formatting
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve Comparison for Regressors')
+plt.legend()
+plt.show()
